@@ -5,8 +5,7 @@ import { EnergyPieChart } from './components/EnergyPieChart.js';
 import { OptimizerForm } from './components/OptimizerForm.js';
 import { Leaf } from 'lucide-react';
 
-// Zmień adres URL na URL produkcyjnego backendu po jego wdrożeniu na Render
-const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const BACKEND_URL = 'https://energy-fg91.onrender.com'
 
 function App() {
   const [energyData, setEnergyData] = useState<EnergyDataResponse | null>(null);
