@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { DailyMix } from '../types/frontend.js';
+import type { DailyMix } from '../types/frontend.js';
 
 interface Props {
   dayData: DailyMix;

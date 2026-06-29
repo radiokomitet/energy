@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Zap, Clock, Calendar } from 'lucide-react';
-import { OptimalWindowResult } from '../types/frontend.js';
+import type { OptimalWindowResult } from '../types/frontend.js';
 
 interface Props {
   backendUrl: string;
