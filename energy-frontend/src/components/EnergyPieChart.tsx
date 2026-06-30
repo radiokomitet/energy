@@ -1,3 +1,4 @@
+// components/EnergyPieChart.tsx
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import type { DailyMix } from '../types/frontend.js';
@@ -8,73 +9,70 @@ interface Props {
   darkMode: boolean;
 }
 
-const COLORS = {
-  coal: '#475569',
-  gas: '#F59E0B',
-  nuclear: '#A855F7',
-  wind: '#10B981',
-  solar: '#FBBF24',
-  hydro: '#3B82F6',
-  biomass: '#059669',
-  imports: '#64748B',
-  other: '#94A3B8'
+const COLORS: Record<string, string> = {
+  coal: '#64748b',
+  gas: '#b45309',
+  nuclear: '#7c3aed',
+  wind: '#0d9488',
+  solar: '#d97706',
+  hydro: '#0369a1',
+  biomass: '#15803d',
+  imports: '#475569',
+  other: '#94a3b8',
 };
 
-export const EnergyPieChart: React.FC<Props> = ({ dayData, title, darkMode }) => {
-  const chartData = Object.entries(dayData.generationMix).map(([name, value]) => ({
-    name: name.toUpperCase(),
-    value
-  })).filter(item => item.value > 0);
+export const EnergyPieChart: React.FC<Props> = ({ dayData, title }) => {
+  const chartData = Object.entries(dayData.generationMix)
+    .map(([name, value]) => ({ name: name.toUpperCase(), value }))
+    .filter(item => item.value > 0);
 
   return (
-    <div className={`backdrop-blur-xl rounded-3xl p-6 border transition-all duration-500 shadow-2xl hover:scale-[1.02] ${
-      darkMode 
-        ? 'bg-slate-900/40 border-white/10 shadow-black/40' 
-        : 'bg-white/60 border-white/40 shadow-slate-200'
-    }`}>
-      <div className="flex justify-between items-start mb-6">
+    <div
+      className="rounded-2xl p-5"
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+    >
+      <div className="flex justify-between items-start mb-4">
         <div>
-          <h3 className="text-xl font-bold tracking-tight">{title}</h3>
-          <p className="text-xs opacity-50 font-mono mt-0.5">{dayData.date}</p>
+          <h3 className="font-display text-base font-semibold" style={{ color: 'var(--text-h)' }}>
+            {title}
+          </h3>
+          <p className="text-[11px] font-mono-data mt-0.5" style={{ color: 'var(--text)' }}>
+            {dayData.date}
+          </p>
         </div>
-        <div className="bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
-          <span className="text-xs font-bold text-emerald-400">
-            Eko: {dayData.cleanEnergyPercentage}%
-          </span>
+        <div
+          className="px-2.5 py-1 rounded-md text-xs font-mono-data font-semibold"
+          style={{ background: 'var(--teal-soft)', color: 'var(--teal)' }}
+        >
+          {dayData.cleanEnergyPercentage}% EKO
         </div>
       </div>
 
-      <div className="w-full h-64">
+      <div className="w-full h-56">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              innerRadius={60}
-              outerRadius={80}
-              paddingAngle={3}
-              dataKey="value"
-            >
+            <Pie data={chartData} cx="50%" cy="50%" innerRadius={55} outerRadius={75} paddingAngle={2} dataKey="value">
               {chartData.map((entry) => (
-                <Cell key={`cell-${entry.name}`} fill={COLORS[entry.name.toLowerCase() as keyof typeof COLORS] || '#CBD5E1'} />
+                <Cell key={`cell-${entry.name}`} fill={COLORS[entry.name.toLowerCase()] || '#94a3b8'} />
               ))}
             </Pie>
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: darkMode ? '#0f172a' : '#ffffff', 
-                borderColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                borderRadius: '12px',
-                color: darkMode ? '#f8fafc' : '#0f172a'
-              }} 
-              formatter={(value) => `${value}%`} 
+            <Tooltip
+              contentStyle={{
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: '8px',
+                color: 'var(--text-h)',
+                fontFamily: 'var(--font-mono)',
+                fontSize: 12,
+              }}
+              formatter={(value) => `${value}%`}
             />
-            <Legend 
-              layout="horizontal" 
-              verticalAlign="bottom" 
-              align="center" 
-              wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }}
-              formatter={(value) => <span style={{ color: darkMode ? '#94a3b8' : '#475569' }}>{value}</span>}
+            <Legend
+              layout="horizontal"
+              verticalAlign="bottom"
+              align="center"
+              wrapperStyle={{ fontSize: '10px', paddingTop: '8px', fontFamily: 'var(--font-mono)' }}
+              formatter={(value) => <span style={{ color: 'var(--text)' }}>{value}</span>}
             />
           </PieChart>
         </ResponsiveContainer>
