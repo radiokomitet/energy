@@ -52,7 +52,6 @@ h1, h2, h3, .font-display {
   font-variant-numeric: tabular-nums;
 }
 
-/* Signature element: transmission-line divider with pylon ticks */
 .transmission-line {
   position: relative;
   height: 1px;
@@ -70,7 +69,6 @@ h1, h2, h3, .font-display {
 .transmission-line::before { left: 22%; }
 .transmission-line::after { left: 78%; }
 
-/* Pylon silhouette strip used in the header */
 .pylon-strip {
   position: absolute;
   inset: 0;

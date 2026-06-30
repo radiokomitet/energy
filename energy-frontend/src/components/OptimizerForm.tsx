@@ -23,7 +23,7 @@ export const OptimizerForm: React.FC<Props> = ({ backendUrl }) => {
       const response = await axios.get<OptimalWindowResult>(`${backendUrl}/api/optimal-window`, { params: { hours } });
       setResult(response.data);
     } catch {
-      setError('Nie udało się obliczyć optymalnego okna. Spróbuj ponownie.');
+      setError('Calculating the optimal windows failed. Try again');
     } finally {
       setLoading(false);
     }
@@ -42,10 +42,10 @@ export const OptimizerForm: React.FC<Props> = ({ backendUrl }) => {
         </div>
         <div>
           <h2 className="font-display text-lg font-semibold" style={{ color: 'var(--text-h)' }}>
-            Kalkulator ładowania EV
+            EV charging calculator
           </h2>
           <p className="text-xs mt-0.5" style={{ color: 'var(--text)' }}>
-            Zaplanuj ładowanie w oparciu o czystą energię
+            Plan your charging based on clean energy
           </p>
         </div>
       </div>
@@ -53,7 +53,7 @@ export const OptimizerForm: React.FC<Props> = ({ backendUrl }) => {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="block text-[11px] font-mono-data tracking-wide mb-2" style={{ color: 'var(--text)' }}>
-            CZAS ŁADOWANIA (GODZINY)
+            CHARGING TIME (HOURS)
           </label>
           <input
             type="number"
@@ -72,7 +72,7 @@ export const OptimizerForm: React.FC<Props> = ({ backendUrl }) => {
           className="w-full font-display font-semibold p-3.5 rounded-xl transition-opacity active:opacity-80 disabled:opacity-50"
           style={{ background: 'var(--teal)', color: 'var(--surface)' }}
         >
-          {loading ? 'Analizowanie prognozy…' : 'Wyznacz optymalne okno'}
+          {loading ? 'Analysing the forecast' : 'Calculate the optimal time'}
         </button>
       </form>
 
@@ -81,7 +81,7 @@ export const OptimizerForm: React.FC<Props> = ({ backendUrl }) => {
       {result && (
         <div className="mt-6 p-5 rounded-xl" style={{ background: 'var(--teal-soft)', border: '1px solid var(--border)' }}>
           <h4 className="text-[11px] font-mono-data tracking-wide mb-4" style={{ color: 'var(--teal)' }}>
-            REKOMENDOWANY PRZEDZIAŁ
+            RECOMMENDED WINDOW
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex items-center gap-3">
@@ -94,13 +94,13 @@ export const OptimizerForm: React.FC<Props> = ({ backendUrl }) => {
             <div className="flex items-center gap-3">
               <Clock size={18} style={{ color: 'var(--teal)' }} />
               <div>
-                <span className="block text-[10px] font-mono-data" style={{ color: 'var(--text)' }}>KONIEC</span>
+                <span className="block text-[10px] font-mono-data" style={{ color: 'var(--text)' }}>THE END</span>
                 <span className="text-sm font-semibold" style={{ color: 'var(--text-h)' }}>{formatDateTime(result.end)}</span>
               </div>
             </div>
           </div>
           <div className="mt-5 pt-4 flex justify-between items-center" style={{ borderTop: '1px solid var(--border)' }}>
-            <span className="text-xs" style={{ color: 'var(--text)' }}>Średni udział czystej energii</span>
+            <span className="text-xs" style={{ color: 'var(--text)' }}>Average share of clean energy</span>
             <span className="text-2xl font-mono-data font-semibold" style={{ color: 'var(--teal)' }}>
               {result.averageCleanEnergy}%
             </span>

@@ -68,7 +68,7 @@ function App() {
               onClick={() => setDarkMode(!darkMode)}
               className="p-2.5 rounded-lg border transition-colors"
               style={{ borderColor: 'var(--border)', color: darkMode ? 'var(--amber)' : 'var(--teal)' }}
-              aria-label="Przełącz motyw"
+              aria-label="Change the theme"
             >
               {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             </button>
@@ -80,7 +80,7 @@ function App() {
           <section>
             <div className="flex items-baseline justify-between mb-6">
               <h2 className="font-display text-xl font-semibold tracking-tight" style={{ color: 'var(--text-h)' }}>
-                Prognoza miksu energetycznego
+                Power generation forecast
               </h2>
               <span className="text-xs font-mono-data" style={{ color: 'var(--text)' }}>3-DAY</span>
             </div>
@@ -88,7 +88,7 @@ function App() {
             {loading && (
               <div className="flex items-center justify-center p-16">
                 <p className="text-sm font-mono-data" style={{ color: 'var(--text)' }}>
-                  POBIERANIE DANYCH…
+                  DOWNLOADING THE DATA...
                 </p>
               </div>
             )}
@@ -104,8 +104,8 @@ function App() {
 
             {energyData && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {Object.entries(energyData).map(([date, data], index) => {
-                  const titles = ['Dzisiaj', 'Jutro', 'Pojutrze'];
+                {Object.entries(energyData).slice(0, 3).map(([date, data], index) => {
+                  const titles = ['Today', 'Tomorrow'];
                   return (
                     <EnergyPieChart
                       key={date}

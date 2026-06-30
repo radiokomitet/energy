@@ -13,51 +13,57 @@ export class EnergyService {
       .reduce((sum, item) => sum + item.perc, 0);
   }
 
-  async getThreeDaysMix(): Promise<{ [date: string]: DailyMix }> {
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const dayAfterTomorrowStr = format(addDays(new Date(), 2), 'yyyy-MM-dd');
-    
-    // Pobieramy interwał od początku dzisiejszego dnia do końca pojutrzejszego
-    const response = await axios.get<ExternalApiResponse>(`${API_URL}/${todayStr}T00:00Z/${dayAfterTomorrowStr}T23:59Z`);
-    const intervals = response.data.data;
+async getThreeDaysMix(): Promise<{ [date: string]: DailyMix }> {
+  const today = new Date();
+  const todayStr = format(today, 'yyyy-MM-dd');
+  const tomorrowStr = format(addDays(today, 1), 'yyyy-MM-dd');
+  const dayAfterTomorrowStr = format(addDays(today, 2), 'yyyy-MM-dd');
+  
+  const allowedDays = [todayStr, tomorrowStr, dayAfterTomorrowStr];
+  
+  const response = await axios.get<ExternalApiResponse>(`${API_URL}/${todayStr}T00:00Z/${dayAfterTomorrowStr}T23:59Z`);
+  const intervals = response.data.data;
 
-    const grouped: { [key: string]: ExternalDataInterval[] } = {};
+  const grouped: { [key: string]: ExternalDataInterval[] } = {};
+  
+  intervals.forEach(interval => {
+    const dateKey = interval.from.substring(0, 10);
     
-    intervals.forEach(interval => {
-      const dateKey = interval.from.substring(0, 10); // Pobiera format YYYY-MM-DD
+    if (allowedDays.includes(dateKey)) {
       if (!grouped[dateKey]) grouped[dateKey] = [];
       grouped[dateKey].push(interval);
+    }
+  });
+
+  const result: { [date: string]: DailyMix } = {};
+
+  Object.keys(grouped).forEach(date => {
+    const dayIntervals = grouped[date];
+    const fuelTotals: { [fuel: string]: number } = {};
+    let totalCleanEnergy = 0;
+
+    dayIntervals.forEach(interval => {
+      totalCleanEnergy += this.calculateCleanEnergy(interval.generationmix);
+      interval.generationmix.forEach(f => {
+        fuelTotals[f.fuel] = (fuelTotals[f.fuel] || 0) + f.perc;
+      });
     });
 
-    const result: { [date: string]: DailyMix } = {};
-
-    Object.keys(grouped).forEach(date => {
-      const dayIntervals = grouped[date];
-      const fuelTotals: { [fuel: string]: number } = {};
-      let totalCleanEnergy = 0;
-
-      dayIntervals.forEach(interval => {
-        totalCleanEnergy += this.calculateCleanEnergy(interval.generationmix);
-        interval.generationmix.forEach(f => {
-          fuelTotals[f.fuel] = (fuelTotals[f.fuel] || 0) + f.perc;
-        });
-      });
-
-      const count = dayIntervals.length;
-      const averagedMix: { [fuel: string]: number } = {};
-      Object.keys(fuelTotals).forEach(fuel => {
-        averagedMix[fuel] = Math.round((fuelTotals[fuel] / count) * 100) / 100;
-      });
-
-      result[date] = {
-        date,
-        cleanEnergyPercentage: Math.round((totalCleanEnergy / count) * 100) / 100,
-        generationMix: averagedMix
-      };
+    const count = dayIntervals.length;
+    const averagedMix: { [fuel: string]: number } = {};
+    Object.keys(fuelTotals).forEach(fuel => {
+      averagedMix[fuel] = Math.round((fuelTotals[fuel] / count) * 100) / 100;
     });
 
-    return result;
-  }
+    result[date] = {
+      date,
+      cleanEnergyPercentage: Math.round((totalCleanEnergy / count) * 100) / 100,
+      generationMix: averagedMix
+    };
+  });
+
+  return result;
+}
 
   async getOptimalChargingWindow(hours: number): Promise<OptimalWindowResult> {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -74,7 +80,7 @@ export class EnergyService {
     let maxCleanEnergySum = 0;
     let bestStartIndex = 0;
 
-    // Algorytm okna przesuwnego (Sliding Window)
+    // Algorytm okna przesuwnego
     for (let i = 0; i <= intervals.length - intervalsNeeded; i++) {
       let currentSum = 0;
       for (let j = 0; j < intervalsNeeded; j++) {
